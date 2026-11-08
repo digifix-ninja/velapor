@@ -1,0 +1,8 @@
+/target
+/app/src-tauri/gen
+/app/node_modules
+/dist/
+.DS_Store
+Icon?
+*.p12
+*.db

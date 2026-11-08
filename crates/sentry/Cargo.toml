@@ -1,0 +1,19 @@
+[package]
+name = "velapor-sentry"
+description = "Velapor Sentry: the small privileged background service."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[[bin]]
+name = "velapor-sentry"
+path = "src/main.rs"
+
+[dependencies]
+velapor-core.workspace = true
+velapor-probes.workspace = true
+velapor-rules.workspace = true
+velapor-store.workspace = true
+velapor-ipc.workspace = true

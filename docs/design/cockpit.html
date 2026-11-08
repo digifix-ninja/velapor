@@ -1,0 +1,641 @@
+<title>Velapor Cockpit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--
+  Velapor: first interface concept for the cockpit.
+  A static mockup with simulated readings. Nothing here talks to Sentry yet.
+  Same family as Charon (dark, quiet, precise, light used sparingly),
+  but Velapor's light is the candle: one warm flame keeping watch in the dark.
+-->
+<style>
+/* Layout: title bar, domain strip, then a two-column instrument panel (gauges + findings). */
+:root {
+  --bg: #121315;
+  --panel: rgb(24 25 29 / 0.86);
+  --panel-hi: rgb(31 32 37 / 0.94);
+  --ink: 255 255 255;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.14);
+  --text: #eceae6;
+  --text-strong: #ffffff;
+  --text-dim: #9b9aa1;
+  --text-faint: #64636b;
+
+  /* The candle (warm, the brand) and the instrument glass (cold, the data) */
+  --flame: #ffb24a;   --flame-rgb: 255 178 74;
+  --glass: #7fd8ff;   --glass-rgb: 127 216 255;
+
+  /* Severity: colour, icon and word always travel together */
+  --clear: #43d998;   --clear-rgb: 67 217 152;
+  --notice: #7fa8ff;  --notice-rgb: 127 168 255;
+  --warning: #ffb24a; --warning-rgb: 255 178 74;
+  --critical: #ff5f6d;--critical-rgb: 255 95 109;
+
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable", "Segoe UI", Ubuntu, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f2f1ed; --panel: rgb(255 255 255 / 0.78); --panel-hi: rgb(255 255 255 / 0.96);
+    --ink: 20 20 24; --line: rgb(20 20 24 / 0.09); --line-strong: rgb(20 20 24 / 0.17);
+    --text: #18181b; --text-strong: #000; --text-dim: #5b5a61; --text-faint: #9a99a0;
+    --flame: #c4760a; --flame-rgb: 196 118 10; --glass: #0a86b0; --glass-rgb: 10 134 176;
+    --clear: #12995f; --clear-rgb: 18 153 95; --notice: #3a6fd8; --notice-rgb: 58 111 216;
+    --warning: #c4760a; --warning-rgb: 196 118 10; --critical: #d6334a; --critical-rgb: 214 51 74;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f2f1ed; --panel: rgb(255 255 255 / 0.78); --panel-hi: rgb(255 255 255 / 0.96);
+  --ink: 20 20 24; --line: rgb(20 20 24 / 0.09); --line-strong: rgb(20 20 24 / 0.17);
+  --text: #18181b; --text-strong: #000; --text-dim: #5b5a61; --text-faint: #9a99a0;
+  --flame: #c4760a; --flame-rgb: 196 118 10; --glass: #0a86b0; --glass-rgb: 10 134 176;
+  --clear: #12995f; --clear-rgb: 18 153 95; --notice: #3a6fd8; --notice-rgb: 58 111 216;
+  --warning: #c4760a; --warning-rgb: 196 118 10; --critical: #d6334a; --critical-rgb: 214 51 74;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid rgb(var(--glass-rgb) / 0.7); outline-offset: 2px; }
+.mono { font-family: var(--mono); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Backdrop: a faint instrument grid and the candle's glow in the corner */
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgb(var(--ink) / 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--ink) / 0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
+}
+.glow {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 620px; height: 620px; left: -220px; top: -300px;
+  background: radial-gradient(circle, rgb(var(--flame-rgb) / 0.13), transparent 62%);
+  animation: breathe 7s ease-in-out infinite;
+}
+@keyframes breathe { 50% { opacity: 0.65; transform: scale(0.96); } }
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+  display: grid; gap: 18px;
+}
+
+/* ---------------------------------------------------------------- title bar */
+.titlebar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px;
+  padding: 18px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.candle { width: 30px; height: 40px; flex: none; }
+.candle .flame { transform-origin: 15px 17px; animation: flicker 3.2s ease-in-out infinite; }
+@keyframes flicker { 30% { transform: scaleY(1.06) rotate(-2deg); } 60% { transform: scaleY(0.95) rotate(1.5deg); } }
+.wordmark { font: 600 22px/1 var(--mono); letter-spacing: 0.32em; color: var(--text-strong); }
+.motto { font: italic 12px/1 var(--sans); color: var(--text-faint); margin-top: 5px; letter-spacing: 0.02em; }
+
+.headline { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 13px; }
+.pulse {
+  width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--tone);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone) 60%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 10px transparent; }
+}
+.headline strong { color: var(--text); font-weight: 500; }
+
+.actions { display: flex; align-items: center; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: rgb(var(--ink) / 0.03);
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn:hover { background: rgb(var(--ink) / 0.07); }
+.btn.primary {
+  border-color: rgb(var(--flame-rgb) / 0.55);
+  background: linear-gradient(180deg, rgb(var(--flame-rgb) / 0.22), rgb(var(--flame-rgb) / 0.08));
+  color: var(--text-strong);
+  box-shadow: 0 0 22px rgb(var(--flame-rgb) / 0.18);
+}
+.btn.primary:hover { background: rgb(var(--flame-rgb) / 0.28); }
+.btn svg { width: 15px; height: 15px; }
+.icon-btn { width: 34px; padding: 0; justify-content: center; }
+
+.eyebrow {
+  font: 600 10.5px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.eyebrow .aside { color: var(--text-faint); letter-spacing: 0.08em; font-weight: 500; text-transform: none; }
+
+/* ---------------------------------------------------------------- domain strip */
+.domains {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px;
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--line);
+}
+.domain {
+  position: relative; display: grid; gap: 7px; padding: 14px 16px 14px;
+  border: 0; background: var(--panel); text-align: left; transition: background 0.25s var(--ease);
+}
+.domain:hover, .domain.on { background: var(--panel-hi); }
+.domain.on::after {
+  content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 2px;
+  background: var(--tone); box-shadow: 0 0 12px var(--tone);
+}
+.domain .label { font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); display: flex; align-items: center; gap: 7px; }
+.domain .label i { width: 6px; height: 6px; border-radius: 2px; background: var(--tone); box-shadow: 0 0 8px var(--tone); }
+.domain .state { font-size: 15px; color: var(--text); font-weight: 500; }
+.domain .meta { font: 11px/1.3 var(--mono); color: var(--text-faint); }
+
+/* ---------------------------------------------------------------- panel layout */
+.panel-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.col { display: grid; gap: 18px; min-width: 0; }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 18px 18px; display: grid; gap: 14px; min-width: 0;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+
+/* Gauges: round instruments like an aircraft panel */
+.gauges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.gauge { display: grid; justify-items: center; gap: 4px; padding: 6px 0 2px; }
+.gauge svg { width: 100%; max-width: 150px; height: auto; overflow: visible; }
+.gauge .ring-bg { fill: none; stroke: rgb(var(--ink) / 0.07); stroke-width: 7; stroke-linecap: round; }
+.gauge .ring { fill: none; stroke: var(--tone); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 1.1s var(--ease), stroke 0.4s; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--tone) 55%, transparent)); }
+.gauge .tick { stroke: rgb(var(--ink) / 0.18); stroke-width: 1; }
+.gauge .tick.red { stroke: rgb(var(--critical-rgb) / 0.55); }
+.gauge .val { font: 300 26px var(--mono); fill: var(--text-strong); font-variant-numeric: tabular-nums; }
+.gauge .unit { font: 500 10px var(--mono); fill: var(--text-faint); letter-spacing: 0.08em; }
+.gauge .name { font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+.gauge .sub { font: 11px/1.2 var(--mono); color: var(--text-faint); }
+
+/* Trend charts */
+.trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.trend { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 12px 8px; display: grid; gap: 6px; background: rgb(var(--ink) / 0.015); min-width: 0; }
+.trend header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.trend .t-name { font: 600 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); }
+.trend .t-now { font: 400 15px/1 var(--mono); color: var(--text); font-variant-numeric: tabular-nums; }
+.trend .t-now small { color: var(--text-faint); font-size: 11px; margin-left: 3px; }
+.trend canvas { width: 100%; height: 70px; display: block; }
+.trend .t-foot { display: flex; justify-content: space-between; font: 10px/1 var(--mono); color: var(--text-faint); }
+
+/* Processes and sockets */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { font: 600 9.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); text-align: left; padding: 0 10px 9px 0; white-space: nowrap; }
+td { padding: 8px 10px 8px 0; border-top: 1px solid var(--line); white-space: nowrap; }
+td.r, th.r { text-align: right; }
+td .bar { display: inline-block; width: 64px; height: 4px; border-radius: 2px; background: rgb(var(--ink) / 0.07); vertical-align: middle; margin-right: 8px; overflow: hidden; }
+td .bar i { display: block; height: 100%; background: var(--glass); border-radius: 2px; }
+.proc { color: var(--text); }
+.dim { color: var(--text-faint); }
+.tag { font: 600 9.5px/1 var(--mono); letter-spacing: 0.06em; padding: 3px 6px; border-radius: 5px; border: 1px solid var(--line-strong); color: var(--text-dim); }
+.tag.listen { color: var(--glass); border-color: rgb(var(--glass-rgb) / 0.35); }
+.tag.new { color: var(--warning); border-color: rgb(var(--warning-rgb) / 0.4); }
+
+/* ---------------------------------------------------------------- preflight */
+.preflight { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.horizon {
+  width: 96px; height: 96px; border-radius: 50%; position: relative; overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgb(var(--glass-rgb) / 0.22) 0 50%, rgb(var(--flame-rgb) / 0.16) 50% 100%);
+  box-shadow: inset 0 0 18px rgb(0 0 0 / 0.35);
+}
+.horizon::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgb(var(--ink) / 0.45); transform: rotate(-4deg); }
+.horizon::after { content: ""; position: absolute; left: 30px; right: 30px; top: calc(50% - 1px); height: 3px; border-radius: 2px; background: var(--flame); box-shadow: 0 0 10px rgb(var(--flame-rgb) / 0.6); }
+.verdict { font-size: 19px; font-weight: 500; color: var(--text-strong); letter-spacing: -0.01em; }
+.verdict-sub { color: var(--text-dim); margin-top: 3px; }
+.counts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 999px; border: 1px solid rgb(var(--tone-rgb) / 0.35); color: var(--tone); background: rgb(var(--tone-rgb) / 0.08); }
+.chip svg { width: 11px; height: 11px; }
+
+/* ---------------------------------------------------------------- findings */
+.findings { display: grid; gap: 10px; }
+.finding {
+  position: relative; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: rgb(var(--ink) / 0.02); padding: 12px 14px 12px 18px; display: grid; gap: 6px;
+}
+.finding::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--tone); box-shadow: 0 0 10px var(--tone); }
+.finding .f-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.finding h3 { margin: 0; font-size: 13.5px; font-weight: 500; color: var(--text-strong); line-height: 1.35; text-wrap: balance; }
+.finding .when { font: 10.5px/1.4 var(--mono); color: var(--text-faint); white-space: nowrap; }
+.finding p { margin: 0; color: var(--text-dim); font-size: 12.5px; }
+.finding details { font-size: 12.5px; }
+.finding summary { cursor: pointer; color: var(--glass); font: 500 11px/1.6 var(--mono); letter-spacing: 0.04em; list-style: none; }
+.finding summary::-webkit-details-marker { display: none; }
+.finding summary::before { content: "+ "; }
+.finding details[open] summary::before { content: "− "; }
+.finding dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 12px; margin: 8px 0 0; }
+.finding dt { font: 600 9.5px/1.7 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); }
+.finding dd { margin: 0; color: var(--text); }
+.evidence { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); background: rgb(var(--ink) / 0.035); border-radius: 6px; padding: 6px 8px; overflow-x: auto; white-space: pre; }
+
+/* Integrity timeline */
+.timeline { display: grid; gap: 0; }
+.tl-row { display: grid; grid-template-columns: 54px 14px minmax(0, 1fr); gap: 10px; align-items: start; padding: 7px 0; }
+.tl-row time { font: 11px/1.5 var(--mono); color: var(--text-faint); text-align: right; }
+.tl-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 4px; background: var(--tone); box-shadow: 0 0 0 3px rgb(var(--tone-rgb) / 0.15); }
+.tl-row .what { color: var(--text); }
+.tl-row .what small { display: block; color: var(--text-faint); font-size: 11.5px; }
+
+/* Footer: the principles, visible */
+.footer { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--text-faint); font: 11px/1.4 var(--mono); border-top: 1px solid var(--line); padding-top: 14px; }
+.footer .principles { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.footer .principles span::before { content: "●"; color: var(--clear); margin-right: 6px; font-size: 8px; vertical-align: 2px; }
+.concept { color: var(--flame); }
+
+/* Tones */
+.t-clear { --tone: var(--clear); --tone-rgb: var(--clear-rgb); }
+.t-notice { --tone: var(--notice); --tone-rgb: var(--notice-rgb); }
+.t-warning { --tone: var(--warning); --tone-rgb: var(--warning-rgb); }
+.t-critical { --tone: var(--critical); --tone-rgb: var(--critical-rgb); }
+.t-glass { --tone: var(--glass); --tone-rgb: var(--glass-rgb); }
+
+/* ---------------------------------------------------------------- responsive */
+@media (max-width: 1080px) {
+  .panel-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .domains .domain:last-child { grid-column: 1 / -1; }
+  .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trends { grid-template-columns: minmax(0, 1fr); }
+  .actions .btn .lbl-long { display: none; }
+}
+@media (max-width: 420px) {
+  .preflight { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .wordmark { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+</style>
+
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="glow" aria-hidden="true"></div>
+
+<div class="wrap">
+  <!-- Title bar: the candle, the overall state, Preflight -->
+  <header class="titlebar">
+    <div class="brand">
+      <svg class="candle" viewBox="0 0 30 40" aria-hidden="true">
+        <defs>
+          <radialGradient id="halo" cx="50%" cy="40%" r="50%">
+            <stop offset="0" stop-color="var(--flame)" stop-opacity="0.45"></stop>
+            <stop offset="1" stop-color="var(--flame)" stop-opacity="0"></stop>
+          </radialGradient>
+        </defs>
+        <circle cx="15" cy="11" r="11" fill="url(#halo)"></circle>
+        <path class="flame" d="M15 2 C19 8 20 11 18.5 14 C17.6 15.8 16.4 17 15 17 C13.6 17 12.4 15.8 11.5 14 C10 11 11 8 15 2 Z" fill="var(--flame)"></path>
+        <line x1="15" y1="17" x2="15" y2="20" stroke="var(--text-dim)" stroke-width="1.2"></line>
+        <rect x="9" y="20" width="12" height="19" rx="2" fill="none" stroke="var(--text)" stroke-width="1.4"></rect>
+      </svg>
+      <div>
+        <div class="wordmark">VELAPOR</div>
+        <div class="motto">vela por ti</div>
+      </div>
+    </div>
+    <div class="headline t-warning">
+      <span class="pulse"></span>
+      <span><strong>Keep an eye on it.</strong> One drive needs attention, everything else is calm. <span class="dim mono">· 214 checks · last sample 2s ago</span></span>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="run-preflight" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 9.5 14 3l-3.5 11-2.2-4.6L2 9.5Z" stroke-linejoin="round"></path></svg>
+        <span>Run Preflight</span>
+      </button>
+      <button class="btn icon-btn" id="theme" type="button" title="Switch light and dark">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="5.5"></circle><path d="M8 2.5v11A5.5 5.5 0 0 0 8 2.5Z" fill="currentColor"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- The five things Velapor watches -->
+  <nav class="domains" aria-label="Domains">
+    <button class="domain on t-warning" type="button"><span class="label"><i></i>Hardware</span><span class="state">1 warning</span><span class="meta">CPU 58°C · fans 1 820 rpm</span></button>
+    <button class="domain t-clear" type="button"><span class="label"><i></i>Network</span><span class="state">Clear</span><span class="meta">14 ms · 38 connections</span></button>
+    <button class="domain t-notice" type="button"><span class="label"><i></i>System</span><span class="state">1 notice</span><span class="meta">2 updates pending</span></button>
+    <button class="domain t-clear" type="button"><span class="label"><i></i>Performance</span><span class="state">Clear</span><span class="meta">memory pressure normal</span></button>
+    <button class="domain t-notice" type="button"><span class="label"><i></i>Integrity</span><span class="state">1 change</span><span class="meta">new login item today</span></button>
+  </nav>
+
+  <div class="panel-grid">
+    <!-- Left: live instruments -->
+    <div class="col">
+      <section class="card">
+        <div class="eyebrow"><span>Instruments</span><span class="aside">live · every 2 s</span></div>
+        <div class="gauges" id="gauges"></div>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow"><span>Last 60 minutes</span><span class="aside">raw samples</span></div>
+        <div class="trends" id="trends"></div>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow"><span>Hungriest processes</span><span class="aside">by CPU</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Process</th><th>CPU</th><th class="r">Memory</th><th class="r">Disk I/O</th><th class="r">Since</th></tr></thead>
+            <tbody id="procs"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow"><span>Listening ports</span><span class="aside">and who owns them</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Port</th><th>Proto</th><th>Process</th><th>Bound to</th><th class="r">State</th></tr></thead>
+            <tbody>
+              <tr><td class="mono num">22</td><td class="dim mono">tcp</td><td class="proc">sshd</td><td class="mono dim">0.0.0.0</td><td class="r"><span class="tag listen">LISTEN</span></td></tr>
+              <tr><td class="mono num">5000</td><td class="dim mono">tcp</td><td class="proc">ControlCenter</td><td class="mono dim">*</td><td class="r"><span class="tag listen">LISTEN</span></td></tr>
+              <tr><td class="mono num">5432</td><td class="dim mono">tcp</td><td class="proc">postgres</td><td class="mono dim">127.0.0.1</td><td class="r"><span class="tag listen">LISTEN</span></td></tr>
+              <tr><td class="mono num">8384</td><td class="dim mono">tcp</td><td class="proc">syncthing</td><td class="mono dim">127.0.0.1</td><td class="r"><span class="tag new">NEW TODAY</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right: Preflight, findings, integrity -->
+    <div class="col">
+      <section class="card">
+        <div class="eyebrow"><span>Preflight</span><span class="aside">today 08:14</span></div>
+        <div class="preflight">
+          <div class="horizon" aria-hidden="true"></div>
+          <div>
+            <div class="verdict">Keep an eye on it</div>
+            <div class="verdict-sub">211 of 214 checks clear. 6 could not run on this Mac.</div>
+            <div class="counts">
+              <span class="chip t-clear"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m2.5 6.3 2.3 2.2 4.7-5"></path></svg>211 clear</span>
+              <span class="chip t-warning"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 1.8 11 10H1L6 1.8Z" stroke-linejoin="round"></path><path d="M6 5v2.2"></path></svg>1 warning</span>
+              <span class="chip t-notice"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="4.5"></circle><path d="M6 5.4V8.4M6 3.6v.1"></path></svg>2 notices</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow"><span>Findings</span><span class="aside">most important first</span></div>
+        <div class="findings">
+          <article class="finding t-warning">
+            <div class="f-head"><h3>Your main drive is reallocating sectors</h3><span class="when">since 2 days</span></div>
+            <p>The drive has swapped out 24 worn-out sectors for spare ones. It still works, but the count went up twice this week.</p>
+            <details open>
+              <summary>Why, and what to do</summary>
+              <dl>
+                <dt>Likely cause</dt><dd>Normal wear on an older SSD, or the start of a failing drive.</dd>
+                <dt>Recommendation</dt><dd>Make sure your backup is current. If the count keeps rising, plan to replace the drive.</dd>
+                <dt>Evidence</dt><dd><div class="evidence">disk0 · Reallocated_Sector_Ct  8 → 24 (7 d)
+disk0 · Power_On_Hours        21 406 h</div></dd>
+              </dl>
+            </details>
+          </article>
+          <article class="finding t-notice">
+            <div class="f-head"><h3>Two system updates are waiting</h3><span class="when">since 5 days</span></div>
+            <p>macOS 15.4.1 and a security response are ready to install.</p>
+            <details>
+              <summary>Why, and what to do</summary>
+              <dl>
+                <dt>Recommendation</dt><dd>Install them when it suits you, ideally this week.</dd>
+                <dt>Evidence</dt><dd><div class="evidence">softwareupdate -l · 2 items, 1 marked "recommended"</div></dd>
+              </dl>
+            </details>
+          </article>
+          <article class="finding t-notice">
+            <div class="f-head"><h3>A new login item appeared</h3><span class="when">today 07:52</span></div>
+            <p>Syncthing now starts with your Mac and listens on port 8384. If you installed it, mark this as expected.</p>
+            <details>
+              <summary>Why, and what to do</summary>
+              <dl>
+                <dt>Recommendation</dt><dd>Confirm you installed Syncthing. Velapor will stop mentioning it once you do.</dd>
+                <dt>Evidence</dt><dd><div class="evidence">~/Library/LaunchAgents/net.syncthing.plist  (new)</div></dd>
+              </dl>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow"><span>Integrity watch</span><span class="aside">baseline changes</span></div>
+        <div class="timeline">
+          <div class="tl-row t-notice"><time>07:52</time><span class="tl-dot"></span><span class="what">Login item added<small>net.syncthing · not yet marked expected</small></span></div>
+          <div class="tl-row t-clear"><time>Mon</time><span class="tl-dot"></span><span class="what">DNS servers changed<small>marked expected · new router</small></span></div>
+          <div class="tl-row t-clear"><time>12 Oct</time><span class="tl-dot"></span><span class="what">Hosts file unchanged for 30 days<small>SIP, Gatekeeper, FileVault and firewall all on</small></span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="principles"><span>Local only</span><span>Read-only</span><span>Sentry connected</span></div>
+    <div><span class="concept">Concept</span> · simulated readings, not your machine</div>
+  </footer>
+</div>
+
+<script>
+/* Simulated readings so the concept feels alive. Real values will come from Sentry over IPC. */
+(function () {
+  const TAU = Math.PI * 2;
+  const SWEEP = 0.75; // gauges cover 270 degrees, like a real instrument
+
+  /** Picks the severity tone for a value against its warning and critical limits. */
+  function toneFor(value, warn, crit) {
+    if (value >= crit) return "t-critical";
+    if (value >= warn) return "t-warning";
+    return "t-glass";
+  }
+
+  const gauges = [
+    { id: "cpu", name: "CPU", unit: "%", value: 34, warn: 80, crit: 95, max: 100, sub: "10 cores", jitter: 12 },
+    { id: "mem", name: "Memory", unit: "%", value: 61, warn: 85, crit: 95, max: 100, sub: "19.5 / 32 GB", jitter: 2 },
+    { id: "temp", name: "CPU temp", unit: "°C", value: 58, warn: 85, crit: 100, max: 110, sub: "fans 1 820 rpm", jitter: 3 },
+    { id: "disk", name: "Disk", unit: "%", value: 72, warn: 85, crit: 95, max: 100, sub: "560 GB free of 2 TB", jitter: 0 },
+  ];
+
+  /** Draws one round gauge as SVG and returns the element. */
+  function buildGauge(g) {
+    const r = 52, c = 70, len = TAU * r * SWEEP;
+    const ticks = [];
+    for (let i = 0; i <= 10; i++) {
+      const ang = Math.PI * 0.75 + (Math.PI * 1.5) * (i / 10);
+      const x1 = c + Math.cos(ang) * 62, y1 = c + Math.sin(ang) * 62;
+      const x2 = c + Math.cos(ang) * 66, y2 = c + Math.sin(ang) * 66;
+      const red = (i / 10) * g.max >= g.crit;
+      ticks.push(`<line class="tick${red ? " red" : ""}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"></line>`);
+    }
+    const el = document.createElement("div");
+    el.className = "gauge";
+    el.innerHTML = `
+      <svg viewBox="0 0 140 128" role="img" aria-label="${g.name}">
+        ${ticks.join("")}
+        <circle class="ring-bg" cx="${c}" cy="${c}" r="${r}" stroke-dasharray="${len} ${TAU * r}" transform="rotate(135 ${c} ${c})"></circle>
+        <circle class="ring" cx="${c}" cy="${c}" r="${r}" stroke-dasharray="${len} ${TAU * r}" stroke-dashoffset="${len}" transform="rotate(135 ${c} ${c})"></circle>
+        <text class="val" x="${c}" y="${c + 6}" text-anchor="middle">0</text>
+        <text class="unit" x="${c}" y="${c + 22}" text-anchor="middle">${g.unit}</text>
+      </svg>
+      <span class="name">${g.name}</span>
+      <span class="sub">${g.sub}</span>`;
+    g.el = el;
+    g.len = len;
+    return el;
+  }
+
+  /** Moves a gauge's needle ring and number to its current value. */
+  function paintGauge(g) {
+    const ring = g.el.querySelector(".ring");
+    ring.style.strokeDashoffset = String(g.len * (1 - Math.min(g.value, g.max) / g.max));
+    g.el.querySelector(".val").textContent = Math.round(g.value);
+    g.el.className = "gauge " + toneFor(g.value, g.warn, g.crit);
+  }
+
+  const gaugeHost = document.getElementById("gauges");
+  gauges.forEach((g) => gaugeHost.appendChild(buildGauge(g)));
+  requestAnimationFrame(() => gauges.forEach(paintGauge));
+
+  /* Trends: an hour of samples per series, drawn on canvas */
+  const series = [
+    { name: "CPU load", unit: "%", base: 30, amp: 18, max: 100, color: "--glass", fmt: (v) => v.toFixed(0) },
+    { name: "Network", unit: "Mb/s", base: 22, amp: 16, max: 80, color: "--glass", fmt: (v) => v.toFixed(1) },
+    { name: "SSD temp", unit: "°C", base: 44, amp: 4, max: 80, color: "--flame", fmt: (v) => v.toFixed(0) },
+    { name: "Latency", unit: "ms", base: 14, amp: 6, max: 60, color: "--glass", fmt: (v) => v.toFixed(0) },
+  ];
+
+  /** Generates a plausible hour of readings for one series. */
+  function seed(s) {
+    const pts = [];
+    let v = s.base;
+    for (let i = 0; i < 120; i++) {
+      v += (Math.random() - 0.5) * s.amp * 0.35 + (s.base - v) * 0.08;
+      if (Math.random() < 0.03) v += s.amp * (0.8 + Math.random());
+      pts.push(Math.max(0, v));
+    }
+    return pts;
+  }
+
+  /** Reads a colour token from the current theme. */
+  function token(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  /** Draws a series: faint grid, area fill, line and an emphasised last point. */
+  function drawTrend(s) {
+    const cv = s.canvas, dpr = window.devicePixelRatio || 1;
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w) return;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const ctx = cv.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const color = token(s.color), ink = token("--line");
+    ctx.strokeStyle = ink; ctx.lineWidth = 1;
+    for (let i = 1; i < 4; i++) { const y = Math.round((h * i) / 4) + 0.5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    const pad = 4, n = s.points.length;
+    const x = (i) => (i / (n - 1)) * (w - pad * 2) + pad;
+    const y = (v) => h - pad - (Math.min(v, s.max) / s.max) * (h - pad * 2);
+    ctx.beginPath();
+    s.points.forEach((v, i) => (i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v))));
+    ctx.lineWidth = 1.5; ctx.strokeStyle = color; ctx.lineJoin = "round"; ctx.stroke();
+    ctx.lineTo(x(n - 1), h); ctx.lineTo(x(0), h); ctx.closePath();
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, color + "40"); grad.addColorStop(1, color + "00");
+    ctx.fillStyle = grad; ctx.fill();
+    const lx = x(n - 1), ly = y(s.points[n - 1]);
+    ctx.beginPath(); ctx.arc(lx, ly, 3, 0, TAU); ctx.fillStyle = color; ctx.fill();
+    ctx.beginPath(); ctx.arc(lx, ly, 7, 0, TAU); ctx.fillStyle = color + "30"; ctx.fill();
+  }
+
+  const trendHost = document.getElementById("trends");
+  series.forEach((s) => {
+    s.points = seed(s);
+    const el = document.createElement("div");
+    el.className = "trend";
+    el.innerHTML = `<header><span class="t-name">${s.name}</span><span class="t-now"><span class="v"></span><small>${s.unit}</small></span></header>
+      <canvas aria-hidden="true"></canvas><div class="t-foot"><span>−60 min</span><span>now</span></div>`;
+    s.canvas = el.querySelector("canvas");
+    s.now = el.querySelector(".v");
+    trendHost.appendChild(el);
+  });
+
+  /** Redraws every trend and its current value. */
+  function paintTrends() {
+    series.forEach((s) => { s.now.textContent = s.fmt(s.points[s.points.length - 1]); drawTrend(s); });
+  }
+  paintTrends();
+
+  /* Processes */
+  const procs = [
+    { name: "WindowServer", cpu: 14, mem: "612 MB", io: "0.2 MB/s", since: "3 d" },
+    { name: "Xcode", cpu: 11, mem: "2.1 GB", io: "4.8 MB/s", since: "2 h" },
+    { name: "Safari", cpu: 7, mem: "1.4 GB", io: "0.6 MB/s", since: "6 h" },
+    { name: "mds_stores", cpu: 5, mem: "188 MB", io: "12.1 MB/s", since: "14 m" },
+    { name: "syncthing", cpu: 3, mem: "96 MB", io: "1.1 MB/s", since: "2 h" },
+  ];
+
+  /** Fills the process table, nudging the numbers so it looks live. */
+  function paintProcs() {
+    document.getElementById("procs").innerHTML = procs.map((p) => {
+      const cpu = Math.max(0.3, p.cpu + (Math.random() - 0.5) * 4);
+      return `<tr><td class="proc">${p.name}</td><td class="mono num"><span class="bar"><i style="width:${Math.min(100, cpu * 4)}%"></i></span>${cpu.toFixed(1)}%</td><td class="r mono num dim">${p.mem}</td><td class="r mono num dim">${p.io}</td><td class="r mono dim">${p.since}</td></tr>`;
+    }).join("");
+  }
+  paintProcs();
+
+  /** One simulated Sentry tick: new values everywhere. */
+  function tick() {
+    gauges.forEach((g) => { g.value = Math.max(2, Math.min(g.max, g.value + (Math.random() - 0.5) * g.jitter)); paintGauge(g); });
+    series.forEach((s) => {
+      const last = s.points[s.points.length - 1];
+      s.points.push(Math.max(0, last + (Math.random() - 0.5) * s.amp * 0.35 + (s.base - last) * 0.08));
+      s.points.shift();
+    });
+    paintTrends();
+    paintProcs();
+  }
+  setInterval(tick, 2000);
+  window.addEventListener("resize", paintTrends);
+
+  /* Theme toggle for the concept */
+  document.getElementById("theme").addEventListener("click", () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : !matchMedia("(prefers-color-scheme: light)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    requestAnimationFrame(paintTrends);
+  });
+
+  /* Domain tabs: just the selection state in this concept */
+  document.querySelectorAll(".domain").forEach((d) => d.addEventListener("click", () => {
+    document.querySelectorAll(".domain").forEach((x) => x.classList.remove("on"));
+    d.classList.add("on");
+  }));
+
+  /* Preflight: a short sweep animation over the instruments */
+  document.getElementById("run-preflight").addEventListener("click", (e) => {
+    const btn = e.currentTarget, label = btn.querySelector("span");
+    btn.disabled = true; label.textContent = "Checking…";
+    let n = 0;
+    const sweep = setInterval(() => {
+      gauges.forEach((g) => { g.value = Math.random() * g.max * 0.9; paintGauge(g); });
+      if (++n > 6) { clearInterval(sweep); tick(); label.textContent = "Run Preflight"; btn.disabled = false; }
+    }, 220);
+  });
+})();
+</script>

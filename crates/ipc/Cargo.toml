@@ -1,0 +1,11 @@
+[package]
+name = "velapor-ipc"
+description = "Protocol and local transport between the Velapor app and Velapor Sentry."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+velapor-core.workspace = true
