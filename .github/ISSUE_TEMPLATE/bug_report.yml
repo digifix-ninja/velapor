@@ -1,0 +1,29 @@
+name: Bug report
+description: Something doesn't work as it should
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Velapor version and system
+      placeholder: "0.1.0 on macOS 15 (Apple Silicon)"
+    validations:
+      required: true
+  - type: dropdown
+    id: tab
+    attributes:
+      label: Where in Velapor
+      options: [Overview, Hardware, Software, Network, Performance, Integrity, Preflight, Menu bar or tray, Notifications, Somewhere else]
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: A wrong reading, a warning that shouldn't be there, or one that is missing.
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: The finding
+      description: The text of the finding and its evidence, if it is about one.
+      render: text

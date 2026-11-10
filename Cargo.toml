@@ -1,27 +1,9 @@
 [workspace]
 resolver = "2"
-members = [
-    "crates/core",
-    "crates/probes",
-    "crates/rules",
-    "crates/store",
-    "crates/ipc",
-    "crates/sentry",
-]
+members = ["core", "src-tauri"]
 
-[workspace.package]
-version = "0.0.1"
-edition = "2021"
-license = "MIT"
-repository = "https://github.com/steanart/velapor"
-homepage = "https://velapor.app"
-
-[workspace.dependencies]
-velapor-core = { path = "crates/core" }
-velapor-probes = { path = "crates/probes" }
-velapor-rules = { path = "crates/rules" }
-velapor-store = { path = "crates/store" }
-velapor-ipc = { path = "crates/ipc" }
+[profile.dev]
+incremental = false
 
 [profile.release]
 codegen-units = 1

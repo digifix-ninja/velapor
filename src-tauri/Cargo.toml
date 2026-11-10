@@ -1,0 +1,19 @@
+[package]
+name = "velapor"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["stean.ART"]
+description = "Velapor watches your machine, explains what it sees, and never changes a thing"
+default-run = "velapor"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+velapor-core = { path = "../core" }
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-notification = "2"

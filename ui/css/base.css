@@ -1,0 +1,101 @@
+/* The page itself: backdrop, title bar, buttons and the small type styles used everywhere. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.6; }
+button:focus-visible, summary:focus-visible { outline: 2px solid rgb(var(--glass-rgb) / 0.7); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.mono { font-family: var(--mono); }
+.num { font-variant-numeric: tabular-nums; }
+.dim { color: var(--text-faint); }
+.selectable { user-select: text; -webkit-user-select: text; cursor: text; }
+
+/* Backdrop: a faint instrument grid and the candle's glow in the corner */
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgb(var(--ink) / 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--ink) / 0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
+}
+.glow {
+  position: fixed; z-index: 0; pointer-events: none;
+  width: 620px; height: 620px; left: -220px; top: -300px;
+  background: radial-gradient(circle, rgb(var(--flame-rgb) / 0.13), transparent 62%);
+  animation: breathe 7s ease-in-out infinite;
+}
+@keyframes breathe { 50% { opacity: 0.65; transform: scale(0.96); } }
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 1320px; margin: 0 auto;
+  padding: 0 22px 34px;
+  display: grid; gap: 18px;
+}
+
+/* Title bar: mark, verdict, actions. The whole bar moves the window. */
+.titlebar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px;
+  padding: 18px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.mac .titlebar { padding-left: 72px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mark { width: 42px; height: 42px; flex: none; color: var(--text); overflow: visible; }
+.mark .flame { transform-origin: 32px 34px; animation: flicker 3.2s ease-in-out infinite; filter: drop-shadow(0 0 3px rgb(var(--flame-rgb) / 0.7)); }
+@keyframes flicker { 30% { transform: scaleY(1.06) rotate(-2deg); } 60% { transform: scaleY(0.95) rotate(1.5deg); } }
+.wordmark { font: 600 21px/1 var(--mono); letter-spacing: 0.32em; color: var(--text-strong); }
+.motto { font: italic 12px/1 var(--sans); color: var(--text-faint); margin-top: 5px; letter-spacing: 0.02em; }
+
+.headline { flex: 1; min-width: 240px; display: flex; align-items: center; gap: 10px; color: var(--text-dim); }
+.headline strong { color: var(--text); font-weight: 500; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--tone); animation: pulse 2.4s var(--ease) infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone) 60%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 10px transparent; }
+}
+
+.actions { display: flex; align-items: center; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: rgb(var(--ink) / 0.03);
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) { background: rgb(var(--ink) / 0.07); }
+.btn.primary {
+  border-color: rgb(var(--flame-rgb) / 0.55);
+  background: linear-gradient(180deg, rgb(var(--flame-rgb) / 0.22), rgb(var(--flame-rgb) / 0.08));
+  color: var(--text-strong);
+  box-shadow: 0 0 22px rgb(var(--flame-rgb) / 0.18);
+}
+.btn.primary:hover:not(:disabled) { background: rgb(var(--flame-rgb) / 0.28); }
+.btn svg { width: 15px; height: 15px; }
+.icon-btn { width: 34px; padding: 0; justify-content: center; }
+
+.eyebrow {
+  font: 600 10.5px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.eyebrow .aside { color: var(--text-faint); letter-spacing: 0.08em; font-weight: 500; text-transform: none; }
+
+/* Footer: the principles, visible */
+.footer { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; color: var(--text-faint); font: 11px/1.4 var(--mono); border-top: 1px solid var(--line); padding-top: 14px; }
+.footer .principles { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.footer .principles span::before { content: "●"; color: var(--clear); margin-right: 6px; font-size: 8px; vertical-align: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

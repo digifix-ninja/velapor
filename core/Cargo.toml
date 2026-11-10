@@ -1,0 +1,20 @@
+[package]
+name = "velapor-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["stean.ART"]
+description = "Velapor's watchman: reads the machine, never changes it, and explains what it sees"
+
+[dependencies]
+log = "0.4"
+netstat2 = "0.11"
+nusb = "0.2"
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+starship-battery = "0.12"
+sysinfo = "0.40"
+ureq = "3"
+
+[dev-dependencies]
+serde_json = "1"

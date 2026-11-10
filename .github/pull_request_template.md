@@ -8,6 +8,6 @@
 
 ## Checks
 
-- [ ] `cargo fmt --all`, `cargo clippy --workspace --all-targets -- -D warnings` and `cargo test --workspace` pass
-- [ ] Nothing in this change lets Velapor modify the system without explicit user confirmation
-- [ ] New findings carry their evidence
+- [ ] `cargo fmt --all`, `cargo clippy --workspace -- -D warnings` and `cargo test --workspace` pass
+- [ ] Velapor still only reads: nothing in `core/` writes, changes or deletes anything (`core/tests/read_only.rs` passes)
+- [ ] A new rule has a test in `core/`
