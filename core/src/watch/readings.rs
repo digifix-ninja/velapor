@@ -7,7 +7,7 @@ use crate::probes::{
 use serde::Serialize;
 
 /// The latest reading of every probe. Rules look at this; the window shows it.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Readings {
     /// What the machine is: model, processor, memory, system.

@@ -6,7 +6,7 @@ use std::time::Duration;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
 
 /// What the processor is doing right now.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CpuReading {
     /// Average load over all cores, 0–100.
@@ -24,7 +24,7 @@ pub struct CpuReading {
 }
 
 /// How memory is used.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MemoryReading {
     /// Installed memory in bytes.
@@ -52,7 +52,7 @@ impl MemoryReading {
 }
 
 /// Processor and memory together: both come from the same system query.
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct ProcessorReport {
     /// The processor.
     pub cpu: CpuReading,
