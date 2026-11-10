@@ -1,6 +1,8 @@
 # Builds Velapor for macOS (Apple Silicon and Intel), Windows and Linux on GitHub's servers.
 #
-# Two ways it runs:
+# Three ways it runs:
+#   * Pull request: the tests run and all installers are built, to check every system. Nothing
+#     is released.
 #   * Version tag pushed (git tag v0.1.0 && git push origin v0.1.0): installers are attached
 #     to a *draft* release, so nothing is public until you press "Publish" on GitHub.
 #   * Started by hand (Actions → Build Velapor → Run workflow): installers are kept as downloadable
@@ -16,6 +18,7 @@ name: Build Velapor
 on:
   push:
     tags: ["v*"]
+  pull_request:
   workflow_dispatch:
     inputs:
       version:
