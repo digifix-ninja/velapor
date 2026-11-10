@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Velapor",
+  "version": "0.1.0",
+  "identifier": "dev.stean.velapor",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Velapor",
+        "width": 1240,
+        "height": 820,
+        "minWidth": 760,
+        "minHeight": 560,
+        "center": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": { "x": 18, "y": 33 }
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "stean.ART",
+    "copyright": "© 2026 stean.ART · MIT licence",
+    "category": "Utility",
+    "shortDescription": "Watches your machine and explains what it sees",
+    "longDescription": "Velapor reads your hardware, software, network, performance and security settings, explains every problem in plain language, and never changes a thing.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    },
+    "linux": {
+      "deb": {
+        "depends": ["libayatana-appindicator3-1"]
+      }
+    }
+  }
+}

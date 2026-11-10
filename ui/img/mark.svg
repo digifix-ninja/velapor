@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Velapor">
+  <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="2.6"/>
+  <g stroke="currentColor" stroke-linecap="round">
+    <line x1="6.89" y1="36.43" x2="11.32" y2="35.65" stroke-width="2.2"/>
+    <line x1="6.67" y1="29.04" x2="9.35" y2="29.35" stroke-width="1.4"/>
+    <line x1="8.59" y1="21.90" x2="11.06" y2="22.97" stroke-width="1.4"/>
+    <line x1="12.47" y1="15.61" x2="15.91" y2="18.50" stroke-width="2.2"/>
+    <line x1="17.99" y1="10.70" x2="19.47" y2="12.95" stroke-width="1.4"/>
+    <line x1="24.69" y1="7.57" x2="25.46" y2="10.16" stroke-width="1.4"/>
+    <line x1="32.00" y1="6.50" x2="32.00" y2="11.00" stroke-width="2.2"/>
+    <line x1="39.31" y1="7.57" x2="38.54" y2="10.16" stroke-width="1.4"/>
+    <line x1="46.01" y1="10.70" x2="44.53" y2="12.95" stroke-width="1.4"/>
+    <line x1="51.53" y1="15.61" x2="48.09" y2="18.50" stroke-width="2.2"/>
+    <line x1="55.41" y1="21.90" x2="52.94" y2="22.97" stroke-width="1.4"/>
+    <line x1="57.33" y1="29.04" x2="54.65" y2="29.35" stroke-width="1.4"/>
+    <line x1="57.11" y1="36.43" x2="52.68" y2="35.65" stroke-width="2.2"/>
+  </g>
+  <g fill="currentColor">
+    <path d="M34.00 43.68 L13.20 16.60 L30.00 46.32 Z"/>
+    <path d="M34.00 46.32 L50.80 16.60 L30.00 43.68 Z"/>
+  </g>
+  <circle cx="32" cy="45" r="3.6" fill="currentColor"/>
+  <path d="M32 35 C27.6 35 25.4 31.6 26 28 C26.6 24.4 29.4 22.6 30 18.8 C30.2 17.4 30 16.2 29.6 15 C33.4 16.8 37 20.6 37.8 25 C38.6 30 36.2 35 32 35 Z" fill="#ffb24a"/>
+  <path d="M32 32.6 C30.2 32.6 29.2 31.2 29.4 29.6 C29.6 28 30.8 27 31.2 25 C33 26.2 34.6 28 34.6 29.8 C34.6 31.4 33.6 32.6 32 32.6 Z" fill="#fff1d6"/>
+</svg>

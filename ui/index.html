@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Velapor</title>
+  <link rel="icon" href="img/mark.svg">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cockpit.css">
+  <link rel="stylesheet" href="css/overlays.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <!-- Title bar: the mark, the verdict, Preflight and About. Dragging it moves the window. -->
+    <header class="titlebar" data-tauri-drag-region>
+      <div class="brand" data-tauri-drag-region>
+        <span id="mark"></span>
+        <div data-tauri-drag-region>
+          <div class="wordmark">VELAPOR</div>
+          <div class="motto">vela por ti</div>
+        </div>
+      </div>
+      <div class="headline t-faint" id="headline" data-tauri-drag-region>
+        <span class="pulse"></span>
+        <span><strong class="title">Looking at your machine…</strong> <span class="detail"></span> <span class="dim mono meta"></span></span>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btn-preflight" type="button"><span class="ico" data-icon="preflight"></span><span class="label">Run Preflight</span></button>
+        <button class="btn icon-btn" id="btn-about" type="button" title="About Velapor"><span class="ico" data-icon="info"></span></button>
+      </div>
+    </header>
+
+    <!-- Tabs: the overview and the five things Velapor watches -->
+    <nav class="domains" id="tabs" role="tablist" aria-label="What Velapor watches"></nav>
+
+    <!-- ============================================================ OVERVIEW -->
+    <section class="view" id="view-overview" role="tabpanel">
+      <div class="panel-grid">
+        <div class="col">
+          <section class="card">
+            <div class="eyebrow"><span>Instruments</span><span class="aside">live · every 2 s</span></div>
+            <div class="gauges" data-gauges></div>
+          </section>
+          <section class="card">
+            <div class="eyebrow"><span>Since Velapor opened</span><span class="aside">up to the last hour</span></div>
+            <div class="trends" data-trends></div>
+          </section>
+        </div>
+        <div class="col">
+          <section class="card">
+            <div class="eyebrow"><span>Preflight</span><span class="aside" data-preflight-when>not run yet</span></div>
+            <div class="preflight">
+              <div class="horizon" data-horizon aria-hidden="true"></div>
+              <div data-preflight-summary></div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="eyebrow"><span>All findings</span><span class="aside">most important first</span></div>
+            <div class="findings" data-findings></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ HARDWARE -->
+    <section class="view" id="view-hardware" role="tabpanel" hidden>
+      <div class="view-head"><h2>Hardware</h2><p>What the machine is made of, what is attached to it, and how warm, full and worn its parts are.</p></div>
+      <section class="card">
+        <div class="eyebrow"><span>Instruments</span><span class="aside">live · every 2 s</span></div>
+        <div class="gauges" data-gauges></div>
+      </section>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>This machine</span><span class="aside">what is inside</span></div>
+          <dl class="kv selectable" data-machine></dl>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Power</span><span class="aside">adapter and battery</span></div>
+          <dl class="kv" data-power></dl>
+        </section>
+      </div>
+      <section class="card">
+        <div class="eyebrow"><span>Attached devices</span><span class="aside">USB, Bluetooth, displays and power</span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Device</th><th>Connected via</th><th>Details</th><th class="r">State</th></tr></thead>
+          <tbody data-devices></tbody>
+        </table></div>
+      </section>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Drives</span><span class="aside">space and activity</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Drive</th><th>Used</th><th class="r">Free</th><th class="r">Read</th><th class="r">Write</th></tr></thead>
+            <tbody data-drives></tbody>
+          </table></div>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Sensors</span><span class="aside">green band is the safe range</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Sensor</th><th class="r">Now</th><th>Range</th></tr></thead>
+            <tbody data-sensors></tbody>
+          </table></div>
+        </section>
+      </div>
+      <section class="card">
+        <div class="eyebrow"><span>Findings</span><span class="aside" data-checks-aside></span></div>
+        <div class="findings" data-findings></div>
+        <div class="checks" data-checks></div>
+      </section>
+    </section>
+
+    <!-- ============================================================ SOFTWARE -->
+    <section class="view" id="view-software" role="tabpanel" hidden>
+      <div class="view-head"><h2>Software</h2><p>The operating system and everything that starts with it.</p></div>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Operating system</span><span class="aside">as it reports itself</span></div>
+          <dl class="kv selectable" data-system></dl>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Findings</span><span class="aside" data-checks-aside></span></div>
+          <div class="findings" data-findings></div>
+          <div class="checks" data-checks></div>
+        </section>
+      </div>
+      <section class="card">
+        <div class="eyebrow"><span>Startup items</span><span class="aside" data-startup-aside></span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Item</th><th>Kind</th><th>Where</th><th class="r">State</th></tr></thead>
+          <tbody data-startup></tbody>
+        </table></div>
+      </section>
+    </section>
+
+    <!-- ============================================================ NETWORK -->
+    <section class="view" id="view-network" role="tabpanel" hidden>
+      <div class="view-head"><h2>Network</h2><p>How fast, who is listening, and who is talking. Velapor never looks inside your traffic.</p></div>
+      <section class="card" data-speed-test>
+        <div class="eyebrow"><span>Speed test</span><span class="aside">only runs when you press it</span></div>
+        <div class="speed">
+          <div class="speed-dial">
+            <svg viewBox="0 0 200 130" aria-hidden="true">
+              <path class="sd-bg" d="M20 115 A80 80 0 0 1 180 115"/>
+              <path class="sd-ring" d="M20 115 A80 80 0 0 1 180 115"/>
+              <text class="sd-val" x="100" y="100" text-anchor="middle">—</text>
+              <text class="sd-unit" x="100" y="120" text-anchor="middle">press to measure</text>
+            </svg>
+            <button class="btn primary" data-run-speed type="button"><span class="ico" data-icon="speed"></span><span class="label">Run speed test</span></button>
+          </div>
+          <div class="speed-facts">
+            <div class="sf"><span class="sf-k">Download</span><span class="sf-v" data-fact="down">—<small>Mb/s</small></span></div>
+            <div class="sf"><span class="sf-k">Upload</span><span class="sf-v" data-fact="up">—<small>Mb/s</small></span></div>
+            <div class="sf"><span class="sf-k">Ping</span><span class="sf-v" data-fact="ping">—<small>ms</small></span></div>
+            <div class="sf"><span class="sf-k">Jitter</span><span class="sf-v" data-fact="jitter">—<small>ms</small></span></div>
+            <p class="speed-note" data-speed-note>Measured against Cloudflare's speed test. Only test data travels; nothing about your machine.</p>
+          </div>
+        </div>
+        <div class="table-wrap" data-speed-history hidden><table>
+          <thead><tr><th>When</th><th class="r">Down</th><th class="r">Up</th><th class="r">Ping</th><th class="r">Jitter</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </section>
+      <section class="card">
+        <div class="eyebrow"><span>Traffic</span><span class="aside">all interfaces</span></div>
+        <div class="trends" data-trends></div>
+      </section>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Listening ports</span><span class="aside">and who owns them</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Port</th><th>Proto</th><th>Process</th><th>Bound to</th><th class="r">Reach</th></tr></thead>
+            <tbody data-ports></tbody>
+          </table></div>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Interfaces</span><span class="aside">with an address</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Name</th><th>Address</th><th class="r">In</th><th class="r">Out</th></tr></thead>
+            <tbody data-interfaces></tbody>
+          </table></div>
+        </section>
+      </div>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Busiest connections</span><span class="aside" data-connections-aside></span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Process</th><th class="r">Open</th><th>Talking to</th></tr></thead>
+            <tbody data-connections></tbody>
+          </table></div>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Findings</span><span class="aside" data-checks-aside></span></div>
+          <div class="findings" data-findings></div>
+          <div class="checks" data-checks></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================================================ PERFORMANCE -->
+    <section class="view" id="view-performance" role="tabpanel" hidden>
+      <div class="view-head"><h2>Performance</h2><p>What keeps the machine busy right now, and whether it has been busy for a while.</p></div>
+      <section class="card">
+        <div class="eyebrow"><span>Since Velapor opened</span><span class="aside" data-load-aside></span></div>
+        <div class="trends" data-trends></div>
+      </section>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Busiest processes</span><span class="aside">by processor</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Process</th><th>CPU</th><th class="r">Memory</th><th class="r">Disk</th><th class="r">Running</th></tr></thead>
+            <tbody data-by-cpu></tbody>
+          </table></div>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Largest processes</span><span class="aside">by memory</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Process</th><th>Memory</th><th class="r">CPU</th><th class="r">Running</th></tr></thead>
+            <tbody data-by-memory></tbody>
+          </table></div>
+        </section>
+      </div>
+      <section class="card">
+        <div class="eyebrow"><span>Findings</span><span class="aside" data-checks-aside></span></div>
+        <div class="findings" data-findings></div>
+        <div class="checks" data-checks></div>
+      </section>
+    </section>
+
+    <!-- ============================================================ INTEGRITY -->
+    <section class="view" id="view-integrity" role="tabpanel" hidden>
+      <div class="view-head"><h2>Integrity</h2><p>Security settings, and the parts of the system that should stay still. "Changed" means changed since Velapor opened.</p></div>
+      <section class="card">
+        <div class="eyebrow"><span>Security settings</span><span class="aside">read every five minutes</span></div>
+        <div class="posture" data-posture></div>
+      </section>
+      <div class="split">
+        <section class="card">
+          <div class="eyebrow"><span>Watched since opening</span><span class="aside" data-baseline-aside></span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>What</th><th>Now</th><th class="r">State</th></tr></thead>
+            <tbody data-baselines></tbody>
+          </table></div>
+        </section>
+        <section class="card">
+          <div class="eyebrow"><span>Findings</span><span class="aside" data-checks-aside></span></div>
+          <div class="findings" data-findings></div>
+          <div class="checks" data-checks></div>
+        </section>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="principles"><span>Read-only</span><span>Stores nothing</span><span>Stays on this machine</span></div>
+      <div data-watching></div>
+    </footer>
+  </div>
+
+  <!-- Overlays -->
+  <div class="scrim" id="scrim"></div>
+  <aside class="sheet" id="preflight-sheet" aria-hidden="true"></aside>
+  <aside class="sheet" id="about-sheet" aria-hidden="true"></aside>
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>

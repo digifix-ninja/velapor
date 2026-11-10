@@ -1,0 +1,61 @@
+/* Colours, type and spacing. Dark by default; light when the system is light.
+   Velapor's light is the candle (warm amber, the brand); data is drawn in cold
+   "instrument glass" blue. Severity colours always travel with an icon and a word. */
+
+:root {
+  --bg: #121315;
+  --panel: rgb(24 25 29 / 0.86);
+  --panel-hi: rgb(31 32 37 / 0.94);
+  --sheet: #18191d;
+  --ink: 255 255 255;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.14);
+  --text: #eceae6;
+  --text-strong: #ffffff;
+  --text-dim: #9b9aa1;
+  --text-faint: #6d6c74;
+
+  --flame: #ffb24a;    --flame-rgb: 255 178 74;
+  --glass: #7fd8ff;    --glass-rgb: 127 216 255;
+
+  --clear: #43d998;    --clear-rgb: 67 217 152;
+  --notice: #7fa8ff;   --notice-rgb: 127 168 255;
+  --warning: #ffb24a;  --warning-rgb: 255 178 74;
+  --critical: #ff5f6d; --critical-rgb: 255 95 109;
+
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable", "Segoe UI", Ubuntu, Cantarell, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f2f1ed;
+  --panel: rgb(255 255 255 / 0.78);
+  --panel-hi: rgb(255 255 255 / 0.96);
+  --sheet: #fbfaf7;
+  --ink: 20 20 24;
+  --line: rgb(20 20 24 / 0.09);
+  --line-strong: rgb(20 20 24 / 0.17);
+  --text: #18181b;
+  --text-strong: #000000;
+  --text-dim: #5b5a61;
+  --text-faint: #8f8e96;
+  --flame: #c4760a;    --flame-rgb: 196 118 10;
+  --glass: #0a86b0;    --glass-rgb: 10 134 176;
+  --clear: #12995f;    --clear-rgb: 18 153 95;
+  --notice: #3a6fd8;   --notice-rgb: 58 111 216;
+  --warning: #c4760a;  --warning-rgb: 196 118 10;
+  --critical: #d6334a; --critical-rgb: 214 51 74;
+  color-scheme: light;
+}
+
+/* Severity tones: put one of these on an element and use var(--tone) inside it */
+.t-clear    { --tone: var(--clear);    --tone-rgb: var(--clear-rgb); }
+.t-notice   { --tone: var(--notice);   --tone-rgb: var(--notice-rgb); }
+.t-warning  { --tone: var(--warning);  --tone-rgb: var(--warning-rgb); }
+.t-critical { --tone: var(--critical); --tone-rgb: var(--critical-rgb); }
+.t-glass    { --tone: var(--glass);    --tone-rgb: var(--glass-rgb); }
+.t-faint    { --tone: var(--text-faint); --tone-rgb: var(--ink); }
