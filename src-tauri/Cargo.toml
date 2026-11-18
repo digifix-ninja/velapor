@@ -3,7 +3,7 @@ name = "velapor"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-authors = ["stean.ART"]
+authors = ["DigiFix S.à r.l.-S."]
 description = "Velapor watches your machine, explains what it sees, and never changes a thing"
 default-run = "velapor"
 

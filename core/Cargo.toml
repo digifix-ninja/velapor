@@ -3,7 +3,7 @@ name = "velapor-core"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-authors = ["stean.ART"]
+authors = ["DigiFix S.à r.l.-S."]
 description = "Velapor's watchman: reads the machine, never changes it, and explains what it sees"
 
 [dependencies]

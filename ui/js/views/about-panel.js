@@ -43,7 +43,7 @@ export class AboutPanel extends Sheet {
         <div class="links">
           <button class="btn" data-url="${about.appWebsite}" type="button">velapor.app</button>
           ${raw(about.sourceCode ? html`<button class="btn" data-url="${about.sourceCode}" type="button">Source code</button>` : "")}
-          <button class="btn" data-url="${about.family}" type="button">stean.DEV</button>
+          <button class="btn" data-url="${about.family}" type="button">DigiFix.Ninja</button>
         </div>
         <p class="legal">© ${about.copyrightYear} ${about.developer} · ${about.licence} licence</p>
       </div></div>`;

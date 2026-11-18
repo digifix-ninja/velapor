@@ -6,13 +6,13 @@ use tauri::AppHandle;
 /// The app's own website.
 pub const APP_WEBSITE: &str = "https://velapor.app";
 /// Who makes Velapor.
-pub const DEVELOPER: &str = "stean.ART";
+pub const DEVELOPER: &str = "DigiFix S.à r.l.-S.";
 /// The developer's website.
-pub const WEBSITE: &str = "https://stean.art";
-/// The family of apps Velapor belongs to.
-pub const FAMILY: &str = "https://stean.dev";
+pub const WEBSITE: &str = "https://digifix.ninja";
+/// The family of apps Velapor belongs to (DigiFix makes them all, so it is the same site).
+pub const FAMILY: &str = "https://digifix.ninja";
 /// Public source code on GitHub (an empty value hides the link).
-pub const SOURCE_CODE: &str = "https://github.com/steanart/velapor";
+pub const SOURCE_CODE: &str = "https://github.com/digifix-ninja/velapor";
 /// The licence.
 pub const LICENCE: &str = "MIT";
 /// The year in the copyright line.
