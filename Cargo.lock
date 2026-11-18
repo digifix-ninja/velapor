@@ -4676,7 +4676,7 @@ dependencies = [
 
 [[package]]
 name = "velapor"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "log",
  "serde",
@@ -4689,7 +4689,7 @@ dependencies = [
 
 [[package]]
 name = "velapor-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "log",
  "netstat2",

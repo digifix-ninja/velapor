@@ -45,7 +45,7 @@ build output on the internal disk, e.g. `export CARGO_TARGET_DIR="$HOME/Library/
 `.github/workflows/build.yml` runs the core's tests and builds macOS (Apple Silicon and Intel),
 Windows and Linux on GitHub's servers.
 
-- **Push a version tag** (`git tag v0.1.0 && git push origin v0.1.0`): the installers are attached
+- **Push a version tag** (`git tag v1.0.0 && git push origin v1.0.0`): the installers are attached
   to a **draft** release. Nothing is public until you press *Publish*. They always have the same
   names (`Velapor-macOS-Apple-Silicon.dmg`, `Velapor-Windows-Setup.exe`, `Velapor-Linux.deb`…), so
   `releases/latest/download/<name>` always gives the newest version.
