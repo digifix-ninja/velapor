@@ -283,8 +283,8 @@ export class DemoBackend {
       case "run_preflight": return this.preflight();
       case "run_speed_test": return this.speedTest();
       case "about": return {
-        name: "Velapor", version: "0.1.0", appWebsite: "https://velapor.app", developer: "stean.ART", website: "https://stean.art",
-        family: "https://stean.dev", sourceCode: "https://github.com/steanart/velapor", licence: "MIT", copyrightYear: "2026",
+        name: "Velapor", version: "0.1.0", appWebsite: "https://velapor.app", developer: "DigiFix S.à r.l.-S.", website: "https://digifix.ninja",
+        family: "https://digifix.ninja", sourceCode: "https://github.com/digifix-ninja/velapor", licence: "MIT", copyrightYear: "2026",
       };
       case "open_url": return null;
       default: throw new Error(`The demo doesn't know "${command}".`);

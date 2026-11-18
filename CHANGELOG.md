@@ -2,6 +2,11 @@
 
 All notable changes to Velapor are listed here.
 
+## Unreleased
+
+- Velapor is now made by DigiFix S.à r.l.-S.: new home at github.com/digifix-ninja/velapor, and the About panel, licence and installers carry the DigiFix name.
+- New app identifier `ninja.digifix.velapor` (was `dev.stean.velapor`), matching the other DigiFix apps. Velapor stores nothing, so nothing has to move; macOS asks once more whether Velapor may send notifications.
+
 ## 0.1.0 — first light
 
 - Six tabs: **Overview**, **Hardware**, **Software**, **Network**, **Performance** and **Integrity**.
